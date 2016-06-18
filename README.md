@@ -1,2 +1,2 @@
 # chat_server
-Simple chat application
+simple chat application
