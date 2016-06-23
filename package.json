@@ -1,6 +1,6 @@
 {
     "name": "chat_server",
-    "version": "0.0.1 alpha",
+    "version": "0.0.1",
     "description": "Chat application built on top of NodeJS. Uses web sockets (Socket.io)",
     "main": "index.js",
     "scripts": {
