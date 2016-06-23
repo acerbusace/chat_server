@@ -12,7 +12,7 @@
         "url": "git+https://github.com/acerbusace/chat_server.git"
     },
     "author": "Alexkumar Patel & Kunall Banerjee",
-    "license": "ISC",
+    "license": "MIT",
     "bugs": {
         "url": "https://github.com/acerbusace/chat_server/issues"
     },
