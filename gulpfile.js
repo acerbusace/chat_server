@@ -8,6 +8,7 @@ const sass = require('gulp-sass');
 gulp.task('watch', ['sync'], function() {
     // watch for SCSS files
     gulp.watch('./public/stylesheets/**/*.scss', ['scss']);
+    gulp.watch('./views/**/*.jade', browserSync.reload);
 });
 
 gulp.task('scss', function() {
