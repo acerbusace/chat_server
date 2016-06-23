@@ -2,18 +2,20 @@
 
 /* jshint esversion: 6 */
 
-var app = require('express')();
+const express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 const index = require('./routes/index');
 const login = require('./routes/login');
 const path = require('path');
 
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/', login);
 
 app.set('views', path.join(__dirname, 'views'));
-
+app.set('view engine', 'jade');
 
 /* ----------------------------------------------------------------------------- */
 
