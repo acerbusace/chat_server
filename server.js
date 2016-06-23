@@ -1,12 +1,19 @@
 #!/usr/bin/node
 
+/* jshint esversion: 6 */
+
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+const index = require('./routes/index');
+const path = require('path');
 
-app.get('/', function(req, res) {
-    res.sendFile(__dirname + '/index.html');
-});
+app.use('/', index);
+
+app.set('views', path.join(__dirname, 'views'));
+
+
+/* ----------------------------------------------------------------------------- */
 
 io.on('connection', function(socket) {
     console.log('user connected');
@@ -25,3 +32,6 @@ var port = 8000;
 http.listen(port, function() {
     console.log('listening on port ' + port);
 });
+
+
+module.exports = app;

@@ -1,10 +1,10 @@
 {
     "name": "chat_server",
-    "version": "0.0.1 alpha",
+    "version": "0.0.1-alpha.01",
     "description": "Chat application built on top of NodeJS. Uses web sockets (Socket.io)",
-    "main": "index.js",
+    "main": "server.js",
     "scripts": {
-        "start": "node index.js",
+        "start": "node server.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
