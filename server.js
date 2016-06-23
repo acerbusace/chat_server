@@ -1,12 +1,23 @@
 #!/usr/bin/node
 
-var app = require('express')();
+/* jshint esversion: 6 */
+
+const express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+const index = require('./routes/index');
+const login = require('./routes/login');
+const path = require('path');
 
-app.get('/', function(req, res) {
-    res.sendFile(__dirname + '/index.html');
-});
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/', index);
+app.use('/', login);
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+
+/* ----------------------------------------------------------------------------- */
 
 io.on('connection', function(socket) {
     console.log('user connected');
@@ -25,3 +36,6 @@ var port = 8000;
 http.listen(port, function() {
     console.log('listening on port ' + port);
 });
+
+
+module.exports = app;
