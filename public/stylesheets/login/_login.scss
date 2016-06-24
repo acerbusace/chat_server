@@ -1,0 +1,61 @@
+// variables
+// #3A3042;
+// #DDE9F8;
+@mixin center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+@mixin form-minimal {
+    *:focus {
+        outline: none;
+    }
+    input[type="email"],
+    input[type="password"] {
+        background-color: inherit;
+        padding: 10px;
+        border: none;
+        border-bottom: solid 1.5px #191919;
+        position: relative;
+        transition: border ease-in-out 0.3s;
+        width: 100%;
+    }
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+        border-bottom: solid 1.5px #e74c3c;
+    }
+}
+.login {
+    @include center;
+    height: 100vh;
+    background-color: #3a3042;
+    .content {
+        @include form-minimal;
+        width: 450px;
+        h1 {
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        form {
+            input {
+                color: #fff;
+            }
+            input[type="password"] {
+                margin-bottom: 35px;
+            }
+        }
+        a {
+            background-color: #8e44ad;
+            border-radius: 23px;
+            font-weight: 700;
+            margin-left: 165px;
+            padding: 13px 35px;
+            text-align: center;
+            transition: 0.3s ease-in-out;
+        }
+        a:hover {
+            background-color: #9b59b6;
+        }
+    }
+}

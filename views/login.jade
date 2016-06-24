@@ -1,3 +1,14 @@
 extends ./layouts/application
+block title
+    title Login
 block content
-    h1 Login Page
+    .wrapper
+        .login
+            .content
+                h1 Welcome back
+                form(action="/login", method="post")
+                    input(type="email", name="email", placeholder="Email address", autofocus="true")
+                    br
+                    input(type="password", name="pwd", placeholder="Password here")
+                    br
+                    a(href="") Enter &#10148;

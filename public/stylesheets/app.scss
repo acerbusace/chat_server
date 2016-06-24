@@ -1,3 +1,18 @@
+@import 'https://fonts.googleapis.com/css?family=Montserrat:400,700';
 @import 'bourbon/bourbon';
 @import 'neat/neat';
 @import 'login/login';
+* {
+    margin: 0;
+    padding: 0;
+}
+html {
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+}
+a,
+a:active,
+a:visited {
+    color: #fff;
+    text-decoration: none;
+}
