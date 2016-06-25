@@ -14,11 +14,11 @@ const login = require('./routes/login');
 const path = require('path');
 
 app.use(morgan('tiny'));
-app.get('/login', (req, res) => {
-  console.log('login page part');
-  res.sendFile('login.html', { root:'views' });
-});
-// app.use('/', login);
+// app.get('/login', (req, res) => {
+//   console.log('login page part');
+//   res.sendFile('login.html', { root:'views' });
+// });
+app.use('/', login);
 app.use(bodyParser.urlencoded({extended: true}));
 // app.use(session({secret:'this is a legit app', resave: false, saveUninitialized: false}));
 app.use(session({secret:'this is a legit app', resave: false, saveUninitialized: true}));
@@ -56,7 +56,7 @@ passport.serializeUser(function(user, done) {
   console.log('serializeUser: ' + user);
   done(null, user);
 });
-    
+
 passport.deserializeUser(function(user, done) {
   console.log('deserializeUser: ' + user);
   done(null, user);
