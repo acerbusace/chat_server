@@ -24,8 +24,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(session({secret:'this is a legit app', resave: false, saveUninitialized: true}));
 app.use(passport.initialize());
 app.use(passport.session());
-// app.post('/login', auth);
-app.post('/login', passport.authenticate('local', { successRedirect: '/', failureRedirect: '/login'}));
+app.post('/login', auth);
+// app.post('/login', passport.authenticate('local', { successRedirect: '/', failureRedirect: '/login'}));
 app.use(checkAuth);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
@@ -89,7 +89,13 @@ function auth(req, res, next) {
       // return res.send(401);
     }
 
-    return res.redirect('/');
+    req.logIn(user, function(err) {
+      if (err) {
+        console.log('auth err: ' + err);
+        return res.end('logIn err: ' + JSON.stringify(err));
+      }
+      return res.redirect('/');
+    });
   })(req, res, next);
 }
 
