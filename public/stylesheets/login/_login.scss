@@ -11,8 +11,8 @@
     *:focus {
         outline: none;
     }
-    input[type="email"],
-    input[type="password"] {
+    input[type="password"],
+    input[type="username"] {
         background-color: inherit;
         padding: 10px;
         border: none;
@@ -21,9 +21,9 @@
         transition: border ease-in-out 0.3s;
         width: 100%;
     }
-    input[type="email"]:focus,
-    input[type="password"]:focus {
-        border-bottom: solid 1.5px #e74c3c;
+    input[type="password"]:focus,
+    input[type="username"]:focus {
+        border-bottom: solid 2px #e74c3c;
     }
 }
 .login {
@@ -45,8 +45,9 @@
                 margin-bottom: 35px;
             }
         }
-        a {
+        input[type="submit"] {
             background-color: #8e44ad;
+            border: none;
             border-radius: 23px;
             font-weight: 700;
             margin-left: 165px;
@@ -54,8 +55,9 @@
             text-align: center;
             transition: 0.3s ease-in-out;
         }
-        a:hover {
+        input[type="submit"]:hover {
             background-color: #9b59b6;
+            cursor: pointer;
         }
     }
 }
