@@ -14,20 +14,14 @@ const login = require('./routes/login');
 const path = require('path');
 
 app.use(morgan('tiny'));
-// app.get('/login', (req, res) => {
-//   console.log('login page part');
-//   res.sendFile('login.html', { root:'views' });
-// });
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', login);
 app.use(bodyParser.urlencoded({extended: true}));
-// app.use(session({secret:'this is a legit app', resave: false, saveUninitialized: false}));
-app.use(session({secret:'this is a legit app', resave: false, saveUninitialized: true}));
+app.use(session({secret:'this is a legit app', resave: false, saveUninitialized: false}));
 app.use(passport.initialize());
 app.use(passport.session());
 app.post('/login', auth);
-// app.post('/login', passport.authenticate('local', { successRedirect: '/', failureRedirect: '/login'}));
 app.use(checkAuth);
-app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 
 app.set('views', path.join(__dirname, 'views'));
