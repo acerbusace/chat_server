@@ -1,20 +1,31 @@
 /* jshint esversion: 6 */
 
 const express = require('express');
-var bodyParser = require('body-parser');
-var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const session = require('express-session');
 const index = require('./routes/index');
 const login = require('./routes/login');
 const path = require('path');
 
-app.use('/', login);
+app.use(morgan('tiny'));
+app.get('/login', (req, res) => {
+  console.log('login page part');
+  res.sendFile('login.html', { root:'views' });
+});
+// app.use('/', login);
 app.use(bodyParser.urlencoded({extended: true}));
+// app.use(session({secret:'this is a legit app', resave: false, saveUninitialized: false}));
+app.use(session({secret:'this is a legit app', resave: false, saveUninitialized: true}));
 app.use(passport.initialize());
-app.post('/login', auth);
+app.use(passport.session());
+// app.post('/login', auth);
+app.post('/login', passport.authenticate('local', { successRedirect: '/', failureRedirect: '/login'}));
 app.use(checkAuth);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
@@ -24,29 +35,46 @@ app.set('view engine', 'jade');
 
 passport.use(new LocalStrategy(
   function(username, password, done) {
-    console.log('at strategy part');
+    console.log('strategy part');
     console.log('user: ' + username);
     console.log('pass: ' + password);
-    if (username !== 'hello')
+    if (username !== 'hello') {
+      console.log('incorrect username');
       return done(null, false, { message: 'incorrect username' });
+    }
 
-    if (password !== 'world')
+    if (password !== 'world') {
+      console.log('incorrect password');
       return done(null, false, { message: 'incorrect password' });
+    }
 
     return done(null, username);
   }
 ));
+
+passport.serializeUser(function(user, done) {
+  console.log('serializeUser: ' + user);
+  done(null, user);
+});
     
+passport.deserializeUser(function(user, done) {
+  console.log('deserializeUser: ' + user);
+  done(null, user);
+});
 
 function checkAuth(req, res, next) {
+  console.log('auth user: ' + req.user);
   if (!req.user) {
     console.log('user requires authenticated');
 
     return res.redirect('/login');
   }
+
+  next();
 }
 
 function auth(req, res, next) {
+  console.log('auth page part');
   passport.authenticate('local', function(err, user, info) {
     console.log('user: ' + user);
     console.log('info: ' + JSON.stringify(info));
