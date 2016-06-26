@@ -14,14 +14,20 @@ const login = require('./routes/login');
 const authjs = require('./lib/auth.js');
 const auth = new authjs({success:'/', failure:'/login'});
 const mongojs = require('./lib/mongo.js');
-const mongo = new mongojs('mongodb://localhost/test');
+// const mongo = new mongojs();
 const path = require('path');
 
 app.use(morgan('tiny'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', login);
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(session({secret:'this is a legit app', resave: false, saveUninitialized: false}));
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(session({
+    secret: 'this is a legit app',
+    resave: false,
+    saveUninitialized: false
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 app.post('/login', auth.auth);
