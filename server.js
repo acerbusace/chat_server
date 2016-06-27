@@ -13,43 +13,31 @@ const path = require('path');
 
 const index = require('./routes/index');
 const login = require('./routes/login');
-const authjs = require('./lib/auth.js');
-const auth = new authjs({success:'/', failure:'/login'});
-const dbHandler = require('./lib/mongo.js');
+const authHandler = require('./lib/auth.js');
 
-dbHandler(function(mongo) {
-  // mongo.createUser({
-  //   username: 'hello',
-  //   password: 'world'
-  // });
-  
-  // mongo.findUser('hello');
-});
+authHandler(function(err, auth) {
+  if (err) throw err;
 
-// mongo.createUser({
-//   username: 'hello',
-//   password: 'world'
-// });
+  app.use(morgan('tiny'));
+  app.use(express.static(path.join(__dirname, 'public')));
+  app.use('/', login);
 
-app.use(morgan('tiny'));
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/', login);
+  app.use(bodyParser.urlencoded({
+    extended: true
+  }));
 
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+  app.use(session({
+    secret: 'this is a legit app',
+    resave: false,
+    saveUninitialized: false,
+  }));
 
-app.use(session({
-  secret: 'this is a legit app',
-  resave: false,
-  saveUninitialized: false,
-}));
-
-app.use(passport.initialize());
-app.use(passport.session());
-app.post('/login', auth.auth);
-app.use(auth.checkAuth);
-app.use('/', index);
+  app.use(passport.initialize());
+  app.use(passport.session());
+  app.post('/login', auth.auth);
+  app.use(auth.checkAuth);
+  app.use('/', index);
+}, {success:'/', failure:'/login'});
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -69,9 +57,9 @@ io.on('connection', function(socket) {
   });
 });
 
+/* ----------------------------------------------------------------------------- */
+
 var port = 8000;
 http.listen(port, function() {
   console.log('listening on port ' + port);
 });
-
-module.exports = app;
