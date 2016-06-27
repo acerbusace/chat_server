@@ -1,3 +1,4 @@
+.tern-project
 node_modules/
 npm-debug.log
 server.js.orig
