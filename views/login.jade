@@ -6,7 +6,7 @@ block content
         .login
             .content
                 h1 Welcome back
-                form(action="/login", method="post")
+                form.login(action="/login", method="post")
                     input(type="username", name="username", placeholder="Email address", autofocus="true")
                     br
                     input(type="password", name="password", placeholder="Password here")
