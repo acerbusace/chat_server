@@ -1,12 +1,19 @@
 $(document).ready(function() {
     var socket = io();
     $('form').submit(function() {
-        socket.emit('chat message', $('#m').val());
+        var message = {
+            msg: $('#m').val(),
+            created_at: Date.now(),
+        };
+        socket.emit('chat message', JSON.stringify(message));
         $('#m').val('');
         return false;
     });
 
     socket.on('chat message', function(msg) {
-        $('#messages').append($('<li>').text(msg));
+        var data = JSON.parse(msg);
+        var date = new Date(data.created_at);
+        $('#messages').append($('<li>').text(data.msg + '\t' + date.toLocaleTimeString()));
     });
+
 });
