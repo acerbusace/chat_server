@@ -2,26 +2,10 @@ extends ./layouts/application
 block title
     title Socket.IO chat
 block content
-    .content
-        nav
-            ul
-                li
-                    a(href="") User
-                li
-                    a(href="") Home
-                li
-                    a(href="") Settings
-                li
-                    a(href="") Logout
-        section.message-box
-            .info
-                p Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nobis, molestiae, sequi. Quo voluptates pariatur, cum assumenda in natus voluptas maiores, debitis reiciendis quos labore soluta blanditiis laudantium voluptate facilis recusandae.
-            .messages
-            .hit-box  
-        ul#messages
-        //- form.chat-box(action='')
-        //-     input#m(autocomplete='off')
-        //-     button Send
-        script(src='http://code.jquery.com/jquery-1.11.1.js')
-        script(src='https://cdn.socket.io/socket.io-1.2.0.js')
-        script(src='javascripts/functions.js')
+    ul#messages
+    form#form(action='')
+        input#m(autocomplete='off')
+        button Send
+    script(src='http://code.jquery.com/jquery-1.11.1.js')
+    script(src='https://cdn.socket.io/socket.io-1.2.0.js')
+    script(src='javascripts/functions.js')
