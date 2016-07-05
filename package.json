@@ -20,13 +20,9 @@
   "homepage": "https://github.com/acerbusace/chat_server#readme",
   "dependencies": {
     "body-parser": "^1.15.2",
-<<<<<<< HEAD
     "connect-mongo": "^1.2.1",
     "cookie-parser": "^1.4.3",
-||||||| merged common ancestors
-=======
     "dotenv": "^2.0.0",
->>>>>>> 042afba0d6eff7d0a57e3a6e290bc4e22c64e0c7
     "express": "^4.14.0",
     "express-session": "^1.13.0",
     "jade": "^1.11.0",
