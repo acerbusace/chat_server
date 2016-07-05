@@ -10,6 +10,7 @@ const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const path = require('path');
+const env = require('dotenv').config();
 
 const index = require('./routes/index');
 const login = require('./routes/login');
@@ -27,7 +28,7 @@ authHandler(function(err, auth) {
   }));
 
   app.use(session({
-    secret: 'this is a legit app',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
   }));
