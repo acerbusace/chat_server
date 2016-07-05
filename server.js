@@ -46,15 +46,27 @@ authHandler(function(err, auth) {
 
   app.use(passport.initialize());
   app.use(passport.session());
-    resave: false,
-    saveUninitialized: false,
-  }));
 
-  app.use(passport.initialize());
-  app.use(passport.session());
   app.post('/login', auth.auth);
   app.use(auth.checkAuth);
   app.use('/', index);
+
+  io.on('connection', function(socket) {
+    console.log('user connected');
+
+    socket.on('disconnect', function() {
+      console.log('user disconnected');
+    });
+
+    socket.on('chat message', function(message) {
+      var data = JSON.parse(message);
+      auth.getUsername(socket.request.user, function(username) {
+        data['username'] = username;
+        console.log('chat message: ', data);
+        io.emit('chat message', JSON.stringify(data));
+			});
+    });
+  });
 }, {success:'/', failure:'/login'});
 
 app.set('views', path.join(__dirname, 'views'));
@@ -66,7 +78,7 @@ app.set('view engine', 'jade');
 io.use(passportSocketIo.authorize({
   cookieParser: cookieParser,       // the same middleware you registrer in express 
   key:          'connect.sid',       // the name of the cookie where express/connect stores its session_id 
-  secret:       secret,    // the session_secret to parse the cookie 
+  secret:       process.env.SESSION_SECRET,    // the session_secret to parse the cookie 
   store:        sessionStore,        // we NEED to use a sessionstore. no memorystore please 
   success:      onAuthorizeSuccess,  // *optional* callback on success - read more below 
   fail:         onAuthorizeFail,     // *optional* callback on fail/error - read more below 
@@ -91,21 +103,7 @@ function onAuthorizeFail(data, message, error, accept){
   // see: http://socket.io/docs/client-api/#socket > error-object 
 }
 
-io.on('connection', function(socket) {
-  console.log('user connected');
 
-  socket.on('disconnect', function() {
-    console.log('user disconnected');
-  });
-
-  socket.on('chat message', function(message) {
-    var data = JSON.parse(message);
-    console.log('ggwp' + socket.request.user);
-    data['username'] = socket.request.user;
-    console.log('chat message: ', data);
-    io.emit('chat message', JSON.stringify(data));
-  });
-});
 
 /* ----------------------------------------------------------------------------- */
 
