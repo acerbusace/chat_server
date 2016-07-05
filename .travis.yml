@@ -5,3 +5,5 @@ node:
   - "node"
 notifications:
   email: false
+script:
+  - npm run test:single
