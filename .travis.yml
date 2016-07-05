@@ -1,0 +1,7 @@
+before_script:
+  - npm i
+language: node_js
+node:
+  - "node"
+notifications:
+  email: false
