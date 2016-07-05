@@ -1,11 +1,12 @@
 {
   "name": "chat_server",
-  "version": "0.0.1-alpha.02",
+  "version": "0.0.2",
   "description": "Chat application built on top of NodeJS. Uses web sockets (Socket.io)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha tests/*.js -w",
+    "test:single": "mocha tests/test.js"
   },
   "repository": {
     "type": "git",
@@ -19,8 +20,13 @@
   "homepage": "https://github.com/acerbusace/chat_server#readme",
   "dependencies": {
     "body-parser": "^1.15.2",
+<<<<<<< HEAD
     "connect-mongo": "^1.2.1",
     "cookie-parser": "^1.4.3",
+||||||| merged common ancestors
+=======
+    "dotenv": "^2.0.0",
+>>>>>>> 042afba0d6eff7d0a57e3a6e290bc4e22c64e0c7
     "express": "^4.14.0",
     "express-session": "^1.13.0",
     "jade": "^1.11.0",
@@ -35,6 +41,8 @@
     "browser-sync": "^2.13.0",
     "gulp": "^3.9.1",
     "gulp-nodemon": "^2.1.0",
-    "gulp-sass": "^2.3.2"
+    "gulp-sass": "^2.3.2",
+    "mocha": "^2.5.3",
+    "should": "^9.0.2"
   }
 }

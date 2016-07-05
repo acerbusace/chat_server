@@ -13,6 +13,7 @@ const passportSocketIo = require('passport.socketio');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const path = require('path');
+const env = require('dotenv').config();
 
 const index = require('./routes/index');
 const login = require('./routes/login');
@@ -37,8 +38,14 @@ authHandler(function(err, auth) {
   }));
 
   app.use(session({
-    secret: secret,
+    secret: process.env.SESSION_SECRET,
     store: sessionStore,
+    resave: false,
+    saveUninitialized: false,
+  }));
+
+  app.use(passport.initialize());
+  app.use(passport.session());
     resave: false,
     saveUninitialized: false,
   }));
