@@ -13,7 +13,7 @@ $(document).ready(function() {
     socket.on('chat message', function(msg) {
         var data = JSON.parse(msg);
         var date = new Date(data.created_at);
-        $('#messages').append($('<li>').text(data.msg + '\t' + date.toLocaleTimeString()));
+        $('#messages').append($('<li>').text(data.username + ': ' + data.msg + ' | ' + date.toLocaleTimeString()));
     });
 
 });
