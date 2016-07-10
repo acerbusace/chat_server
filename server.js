@@ -17,17 +17,21 @@ const env = require('dotenv').config();
 
 const index = require('./routes/index');
 const login = require('./routes/login');
+const dbHandler = require('./lib/mongo.js');
 const authHandler = require('./lib/auth.js');
+const groupHandler = require('./lib/group.js');
 
 var dbPath = 'mongodb://localhost/chat_server';
-var secret = 'this is a legit app';
 
 var sessionStore = new mongoStore({
   url: dbPath,
 });
 
-authHandler(function(err, auth) {
+dbHandler(function(err, mongo) {
   if (err) throw err;
+
+  var auth = authHandler(mongo, {success:'/', failure:'/login'});
+  var group = groupHandler(mongo);
 
   app.use(morgan('tiny'));
   app.use(express.static(path.join(__dirname, 'public')));
@@ -51,6 +55,8 @@ authHandler(function(err, auth) {
   app.use(auth.checkAuth);
   app.use('/', index);
 
+  /* ----------------------------------------------------------------------------- */
+
   io.on('connection', function(socket) {
     console.log('user connected');
 
@@ -63,47 +69,55 @@ authHandler(function(err, auth) {
       auth.getUsername(socket.request.user, function(username) {
         data['username'] = username;
         console.log('chat message: ', data);
+        group.addMessage(message.groupId, message);
         io.emit('chat message', JSON.stringify(data));
 			});
     });
+
+    socket.on('get groups', function() {
+      group.getGroup(socket.request.user, function(groups) {
+        var data = {groups: groups};
+        socket.emit('get groups', JSON.stringify(data));
+      });
+    });
   });
-}, {success:'/', failure:'/login'});
+
+
+  /* ----------------------------------------------------------------------------- */
+
+  //With Socket.io >= 1.0 
+  io.use(passportSocketIo.authorize({
+    cookieParser: cookieParser,       // the same middleware you registrer in express 
+    key:          'connect.sid',       // the name of the cookie where express/connect stores its session_id 
+    secret:       process.env.SESSION_SECRET,    // the session_secret to parse the cookie 
+    store:        sessionStore,        // we NEED to use a sessionstore. no memorystore please 
+    success:      onAuthorizeSuccess,  // *optional* callback on success - read more below 
+    fail:         onAuthorizeFail,     // *optional* callback on fail/error - read more below 
+  }));
+   
+  function onAuthorizeSuccess(data, accept){
+    console.log('successful connection to socket.io');
+   
+    // If you use socket.io@1.X the callback looks different 
+    accept();
+  }
+   
+  function onAuthorizeFail(data, message, error, accept){
+    if(error)
+      throw new Error(message);
+    console.log('failed connection to socket.io:', message);
+   
+    // If you don't want to accept the connection 
+    if(error)
+      accept(new Error(message));
+    // this error will be sent to the user as a special error-package 
+    // see: http://socket.io/docs/client-api/#socket > error-object 
+  }
+
+});
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-
-/* ----------------------------------------------------------------------------- */
-
-//With Socket.io >= 1.0 
-io.use(passportSocketIo.authorize({
-  cookieParser: cookieParser,       // the same middleware you registrer in express 
-  key:          'connect.sid',       // the name of the cookie where express/connect stores its session_id 
-  secret:       process.env.SESSION_SECRET,    // the session_secret to parse the cookie 
-  store:        sessionStore,        // we NEED to use a sessionstore. no memorystore please 
-  success:      onAuthorizeSuccess,  // *optional* callback on success - read more below 
-  fail:         onAuthorizeFail,     // *optional* callback on fail/error - read more below 
-}));
- 
-function onAuthorizeSuccess(data, accept){
-  console.log('successful connection to socket.io');
- 
-  // If you use socket.io@1.X the callback looks different 
-  accept();
-}
- 
-function onAuthorizeFail(data, message, error, accept){
-  if(error)
-    throw new Error(message);
-  console.log('failed connection to socket.io:', message);
- 
-  // If you don't want to accept the connection 
-  if(error)
-    accept(new Error(message));
-  // this error will be sent to the user as a special error-package 
-  // see: http://socket.io/docs/client-api/#socket > error-object 
-}
-
-
 
 /* ----------------------------------------------------------------------------- */
 
