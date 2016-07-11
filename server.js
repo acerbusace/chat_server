@@ -70,8 +70,16 @@ dbHandler(function(err, mongo) {
         data['username'] = username;
         console.log('chat message: ', data);
         group.addMessage(message.groupId, message);
+        // group.createGroup('test', socket.request.user);
         io.emit('chat message', JSON.stringify(data));
 			});
+    });
+
+    socket.on('get messages', function(groupdId) {
+      group.getMessages(groupId, function(msg) {
+        var data = {messages: msg};
+        socket.emit('get messages', JSON.stringify(data));
+      });
     });
 
     socket.on('get groups', function() {
