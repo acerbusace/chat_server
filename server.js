@@ -64,27 +64,28 @@ dbHandler(function(err, mongo) {
       console.log('user disconnected');
     });
 
-    socket.on('chat message', function(message) {
+    socket.on('add message', function(message) {
       var data = JSON.parse(message);
       auth.getUsername(socket.request.user, function(username) {
-        data['username'] = username;
+        data.userId = socket.request.user;
         console.log('chat message: ', data);
-        group.addMessage(message.groupId, message);
+        group.addMessage(data.groupId, message);
         // group.createGroup('test', socket.request.user);
         io.emit('chat message', JSON.stringify(data));
 			});
     });
 
     socket.on('get messages', function(groupdId) {
-      group.getMessages(groupId, function(msg) {
-        var data = {messages: msg};
+      group.getMessages(groupId, function(messages) {
+        var data = {messages: messages};
         socket.emit('get messages', JSON.stringify(data));
       });
     });
 
     socket.on('get groups', function() {
-      group.getGroup(socket.request.user, function(groups) {
+      group.getGroups(socket.request.user, function(groups) {
         var data = {groups: groups};
+        console.log('at groups');
         socket.emit('get groups', JSON.stringify(data));
       });
     });
