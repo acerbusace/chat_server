@@ -1,13 +1,8 @@
 $(document).ready(function() {
   var socket = io();
   $('form').submit(function() {
-    console.log('at submit');
-    socket.emit('get groups');
-    console.log('at get gg');
-    socket.on('get groups', function(groups) {
-      console.log('at groups');
+    $.post('getGroups', function(groups) {
       console.log(groups);
-      groups = JSON.parse(groups);
 
       var message = {
         msg: $('#m').val(),
@@ -16,12 +11,12 @@ $(document).ready(function() {
       };
 
       $('#m').val('');
+      $.post('addMessage', message, function(data) {
+        console.log('ggwp');
+        console.log(data);
+      }, 'json');
+    }, 'json');
 
-      console.log(message);
-
-      socket.emit('add message', JSON.stringify(message));
-    });
-    
     return false;
   });
 
@@ -30,5 +25,4 @@ $(document).ready(function() {
     var date = new Date(data.created_at);
     $('#messages').append($('<li>').text(data.userId + ': ' + data.msg + ' | ' + date.toLocaleTimeString()));
   });
-
 });
