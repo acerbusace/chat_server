@@ -27,11 +27,42 @@ var sessionStore = new mongoStore({
   url: dbPath,
 });
 
+
+
 dbHandler(function(err, mongo) {
   if (err) throw err;
 
   var auth = authHandler(mongo, {success:'/', failure:'/login'});
   var group = groupHandler(mongo);
+
+  function getMessages(req, res) {
+    console.log(req.body);
+    group.getMessages(req.body.groupId, function(messages) {
+      console.log('get messages');
+      var data = {messages: messages};
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(data));
+    });
+  }
+
+  function addMessage(req, res) {
+    var data = req.body;
+    auth.getUsername(req.user, function(username) {
+      data.userId = req.user;
+      console.log('chat message: ', data);
+      group.addMessage(data.groupId, data);
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(data));
+    });
+  }
+
+  function getGroups(req, res) {
+    group.getGroups(req.user, function(groups) {
+      var data = {groups: groups};
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(data));
+    });
+  }
 
   app.use(morgan('tiny'));
   app.use(express.static(path.join(__dirname, 'public')));
@@ -51,8 +82,11 @@ dbHandler(function(err, mongo) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  app.post('/login', auth.auth);
+  app.get('/login', auth.auth);
   app.use(auth.checkAuth);
+  app.post('/getGroups', getGroups);
+  app.post('/getMessages', getMessages);
+  app.post('/addMessage', addMessage);
   app.use('/', index);
 
   /* ----------------------------------------------------------------------------- */
