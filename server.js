@@ -64,6 +64,23 @@ dbHandler(function(err, mongo) {
     });
   }
 
+  function createGroup(req, res) {
+    var data = req.body;
+    group.createGroup(data.groupName, req.user, function(group) {
+      if (!group) return res.end();
+
+      var data = {group: group};
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(data));
+    });
+  }
+
+  function addUser(req, res) {
+    var data = req.body;
+    group.addUser(req.user, data.groupId);
+    res.end();
+  }
+
   app.use(morgan('tiny'));
   app.use(express.static(path.join(__dirname, 'public')));
   app.use('/', login);
