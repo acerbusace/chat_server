@@ -6,21 +6,30 @@
 const dbHandler = require('../lib/mongo.js');
 const groupHandler = require('../lib/group.js');
 
-
-
-
-
 // module.exports = router;
 module.exports = function(app, auth, group) {
-  function getMessages(req, res) {
-    console.log(req.body);
-    group.getMessages(req.body.groupId, function(messages) {
-      console.log('get messages');
-      var data = {
-        messages: messages
-      };
-      res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify(data));
+  function getMessages(req, res, done) {
+    // console.log('get messages', req.body.groupId);
+    // console.log(req.body.groupId);
+    group.getMessages(req.body.groupId, function(data) {
+      if (data) {
+        // var data = {
+        //   messages: messages
+        // };
+
+        if (typeof(done) == 'function') {
+          done(data);
+        } else {
+          res.setHeader('Content-Type', 'application/json');
+          res.send(JSON.stringify(data));
+        }
+      } else {
+        if (typeof(done) == 'function') {
+          done();
+        } else {
+          res.end();
+        }
+      }
     });
   }
 
@@ -42,8 +51,8 @@ module.exports = function(app, auth, group) {
       };
       if (typeof(done) == 'function') {
         // done(JSON.stringify(data));
-        console.log('Works!');
-        console.log(data);
+        // console.log('Works!');
+        // console.log(data);
         done(data);
       } else {
         res.setHeader('Content-Type', 'application/json');
@@ -71,17 +80,23 @@ module.exports = function(app, auth, group) {
     res.end();
   }
 
-  // router.get('/', (req, res) => {
-  //     res.render('index', {});
-  // });
-
   app.post('/getGroups', getGroups);
   app.post('/getMessages', getMessages);
   app.post('/addMessage', addMessage);
 
   app.use('/', (req, res) => {
     getGroups(req, res, function(data) {
-      res.render('index', {data: data});
+      var groups = [];
+      var itemsProcessed = 0;
+      data.groups.forEach(function(ele) {
+        req.body.groupId = ele;
+        getMessages(req, res, function(group) {
+          groups.push(group);
+          if (++itemsProcessed == data.length) {
+            res.render('index', {data: groups});
+          }
+        });
+      });
     });
   });
 };
