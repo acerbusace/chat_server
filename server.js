@@ -28,58 +28,57 @@ var sessionStore = new mongoStore({
 });
 
 
-
 dbHandler(function(err, mongo) {
   if (err) throw err;
 
   var auth = authHandler(mongo, {success:'/', failure:'/login'});
   var group = groupHandler(mongo);
 
-  function getMessages(req, res) {
-    console.log(req.body);
-    group.getMessages(req.body.groupId, function(messages) {
-      console.log('get messages');
-      var data = {messages: messages};
-      res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify(data));
-    });
-  }
-
-  function addMessage(req, res) {
-    var data = req.body;
-    auth.getUsername(req.user, function(username) {
-      data.userId = req.user;
-      console.log('chat message: ', data);
-      group.addMessage(data.groupId, data);
-      res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify(data));
-    });
-  }
-
-  function getGroups(req, res) {
-    group.getGroups(req.user, function(groups) {
-      var data = {groups: groups};
-      res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify(data));
-    });
-  }
-
-  function createGroup(req, res) {
-    var data = req.body;
-    group.createGroup(data.groupName, req.user, function(group) {
-      if (!group) return res.end();
-
-      var data = {group: group};
-      res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify(data));
-    });
-  }
-
-  function addUser(req, res) {
-    var data = req.body;
-    group.addUser(req.user, data.groupId);
-    res.end();
-  }
+  // function getMessages(req, res) {
+  //   console.log(req.body);
+  //   group.getMessages(req.body.groupId, function(messages) {
+  //     console.log('get messages');
+  //     var data = {messages: messages};
+  //     res.setHeader('Content-Type', 'application/json');
+  //     res.send(JSON.stringify(data));
+  //   });
+  // }
+  //
+  // function addMessage(req, res) {
+  //   var data = req.body;
+  //   auth.getUsername(req.user, function(username) {
+  //     data.userId = req.user;
+  //     console.log('chat message: ', data);
+  //     group.addMessage(data.groupId, data);
+  //     res.setHeader('Content-Type', 'application/json');
+  //     res.send(JSON.stringify(data));
+  //   });
+  // }
+  //
+  // function getGroups(req, res) {
+  //   group.getGroups(req.user, function(groups) {
+  //     var data = {groups: groups};
+  //     res.setHeader('Content-Type', 'application/json');
+  //     res.send(JSON.stringify(data));
+  //   });
+  // }
+  //
+  // function createGroup(req, res) {
+  //   var data = req.body;
+  //   group.createGroup(data.groupName, req.user, function(group) {
+  //     if (!group) return res.end();
+  //
+  //     var data = {group: group};
+  //     res.setHeader('Content-Type', 'application/json');
+  //     res.send(JSON.stringify(data));
+  //   });
+  // }
+  //
+  // function addUser(req, res) {
+  //   var data = req.body;
+  //   group.addUser(req.user, data.groupId);
+  //   res.end();
+  // }
 
   app.use(morgan('tiny'));
   app.use(express.static(path.join(__dirname, 'public')));
@@ -99,12 +98,13 @@ dbHandler(function(err, mongo) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  app.get('/login', auth.auth);
+  app.post('/login', auth.auth);
   app.use(auth.checkAuth);
-  app.post('/getGroups', getGroups);
-  app.post('/getMessages', getMessages);
-  app.post('/addMessage', addMessage);
-  app.use('/', index);
+  // app.post('/getGroups', getGroups);
+  // app.post('/getMessages', getMessages);
+  // app.post('/addMessage', addMessage);
+  // app.use('/', index);
+  index(app, auth, group);
 
   /* ----------------------------------------------------------------------------- */
 
@@ -115,63 +115,63 @@ dbHandler(function(err, mongo) {
       console.log('user disconnected');
     });
 
-    socket.on('add message', function(message) {
-      var data = JSON.parse(message);
-      auth.getUsername(socket.request.user, function(username) {
-        data.userId = socket.request.user;
-        console.log('chat message: ', data);
-        group.addMessage(data.groupId, message);
-        // group.createGroup('test', socket.request.user);
-        io.emit('chat message', JSON.stringify(data));
-			});
-    });
-
-    socket.on('get messages', function(groupdId) {
-      group.getMessages(groupId, function(messages) {
-        var data = {messages: messages};
-        socket.emit('get messages', JSON.stringify(data));
-      });
-    });
-
-    socket.on('get groups', function() {
-      group.getGroups(socket.request.user, function(groups) {
-        var data = {groups: groups};
-        console.log('at groups');
-        socket.emit('get groups', JSON.stringify(data));
-      });
-    });
+    // socket.on('add message', function(message) {
+    //   var data = JSON.parse(message);
+    //   auth.getUsername(socket.request.user, function(username) {
+    //     data.userId = socket.request.user;
+    //     console.log('chat message: ', data);
+    //     group.addMessage(data.groupId, message);
+    //     // group.createGroup('test', socket.request.user);
+    //     io.emit('chat message', JSON.stringify(data));
+		// 	});
+    // });
+    //
+    // socket.on('get messages', function(groupdId) {
+    //   group.getMessages(groupId, function(messages) {
+    //     var data = {messages: messages};
+    //     socket.emit('get messages', JSON.stringify(data));
+    //   });
+    // });
+    //
+    // socket.on('get groups', function() {
+    //   group.getGroups(socket.request.user, function(groups) {
+    //     var data = {groups: groups};
+    //     console.log('at groups');
+    //     socket.emit('get groups', JSON.stringify(data));
+    //   });
+    // });
   });
 
 
   /* ----------------------------------------------------------------------------- */
 
-  //With Socket.io >= 1.0 
+  //With Socket.io >= 1.0
   io.use(passportSocketIo.authorize({
-    cookieParser: cookieParser,       // the same middleware you registrer in express 
-    key:          'connect.sid',       // the name of the cookie where express/connect stores its session_id 
-    secret:       process.env.SESSION_SECRET,    // the session_secret to parse the cookie 
-    store:        sessionStore,        // we NEED to use a sessionstore. no memorystore please 
-    success:      onAuthorizeSuccess,  // *optional* callback on success - read more below 
-    fail:         onAuthorizeFail,     // *optional* callback on fail/error - read more below 
+    cookieParser: cookieParser,       // the same middleware you registrer in express
+    key:          'connect.sid',       // the name of the cookie where express/connect stores its session_id
+    secret:       process.env.SESSION_SECRET,    // the session_secret to parse the cookie
+    store:        sessionStore,        // we NEED to use a sessionstore. no memorystore please
+    success:      onAuthorizeSuccess,  // *optional* callback on success - read more below
+    fail:         onAuthorizeFail,     // *optional* callback on fail/error - read more below
   }));
-   
+
   function onAuthorizeSuccess(data, accept){
     console.log('successful connection to socket.io');
-   
-    // If you use socket.io@1.X the callback looks different 
+
+    // If you use socket.io@1.X the callback looks different
     accept();
   }
-   
+
   function onAuthorizeFail(data, message, error, accept){
     if(error)
       throw new Error(message);
     console.log('failed connection to socket.io:', message);
-   
-    // If you don't want to accept the connection 
+
+    // If you don't want to accept the connection
     if(error)
       accept(new Error(message));
-    // this error will be sent to the user as a special error-package 
-    // see: http://socket.io/docs/client-api/#socket > error-object 
+    // this error will be sent to the user as a special error-package
+    // see: http://socket.io/docs/client-api/#socket > error-object
   }
 
 });
