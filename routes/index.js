@@ -88,15 +88,17 @@ module.exports = function(app, auth, group) {
     getGroups(req, res, function(data) {
       var groups = [];
       var itemsProcessed = 0;
-      data.groups.forEach(function(ele) {
-        req.body.groupId = ele;
-        getMessages(req, res, function(group) {
-          groups.push(group);
-          if (++itemsProcessed == data.length) {
-            res.render('index', {data: groups});
-          }
+      if (data) {
+        data.groups.forEach(function(ele) {
+          req.body.groupId = ele;
+          getMessages(req, res, function(group) {
+            groups.push(group);
+            if (++itemsProcessed == data.groups.length) {
+              res.render('index', {data: groups});
+            }
+          });
         });
-      });
+      } else res.render('index');
     });
   });
 };
