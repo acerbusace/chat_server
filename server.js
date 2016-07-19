@@ -29,7 +29,10 @@ var sessionStore = new mongoStore({
 
 
 dbHandler(function(err, mongo) {
-  if (err) throw err;
+  if (err) {
+    console.error(err);
+    process.exit();
+  }
 
   var auth = authHandler(mongo, {success:'/', failure:'/login'});
   var group = groupHandler(mongo);
